@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flashcards Japanese</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+      background: #fdfdfd;
+    }
+    .card {
+      width: 90%;
+      max-width: 400px;
+      height: 350px;
+      perspective: 1000px;
+      margin-top: 30px;
+    }
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+    }
+    .card.flip .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background: white;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      backface-visibility: hidden;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
+      overflow: hidden;
+    }
+    .card-front img {
+      max-width: 100%;
+      max-height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      background: #273975;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    audio {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎌 Japanese Flashcards</h2>
+  <div class="card" onclick="flipCard()">
+    <div class="card-inner" id="cardInner">
+      <div class="card-front" id="front"></div>
+      <div class="card-back" id="back"></div>
+    </div>
+  </div>
+
+  <button onclick="nextCard()">👉 Next</button>
+
+<script>
+  let data = [];
+  let currentIndex = 0;
+
+  async function loadData() {
+    const sheetAPI = "https://script.google.com/macros/s/AKfycbxZNLzZQtYttsWLbu5jCOQyyo-MEhyhy4v2HwaQSgrlvVfgdgMbZHG7BF8R7b2sgSt2/exec";
+    try {
+      const res = await fetch(sheetAPI);
+      data = await res.json();
+      showCard(); // Chạy khi đã có data
+    } catch (e) {
+      alert("Lỗi khi tải dữ liệu: " + e.message);
+      console.error(e);
+    }
+  }
+
+  function showCard() {
+    const word = data[currentIndex];
+    document.getElementById("front").innerHTML = `
+      <img src="${word.Image}" alt="Image" style="max-width: 100px; display:block; margin:0 auto 10px;">
+      <h1>${word.Kanji}</h1>
+    `;
+    document.getElementById("back").innerHTML = `
+      <p><strong>Romaji:</strong> ${word.Romaji}</p>
+      <p><strong>English:</strong> ${word.English}</p>
+      <p><strong>Vietnamese:</strong> ${word.Vietnamese}</p>
+      <audio controls src="${word.Audio}"></audio>
+    `;
+  }
+
+  function nextCard() {
+    currentIndex = (currentIndex + 1) % data.length;
+    document.querySelector('.card').classList.remove('flip');
+    showCard();
+  }
+
+  function flipCard() {
+    document.querySelector('.card').classList.toggle('flip');
+  }
+
+  loadData();
+console.log(data);
+</script>
+
+</body>
+</html>
