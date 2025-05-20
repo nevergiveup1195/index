@@ -97,17 +97,32 @@
     }
   }
 
+  function sanitizeURL(url) {
+    try {
+      return encodeURI(decodeURI(url));
+    } catch {
+      return url;
+    }
+  }
+
   function showCard() {
     const word = data[currentIndex];
-    document.getElementById("front").innerHTML = `
-      <img src="${word.Image}" alt="Image" style="max-width: 100px; display:block; margin:0 auto 10px;">
+    const imageUrl = sanitizeURL(word.Image);
+
+    const front = document.getElementById("front");
+    front.innerHTML = `
+      <img src="${imageUrl}" alt="Image" 
+           onerror="this.onerror=null; this.src='https://via.placeholder.com/150?text=No+Image';" 
+           style="max-width: 100px; display:block; margin:0 auto 10px;">
       <h1>${word.Kanji}</h1>
     `;
-    document.getElementById("back").innerHTML = `
+
+    const back = document.getElementById("back");
+    back.innerHTML = `
       <p><strong>Romaji:</strong> ${word.Romaji}</p>
       <p><strong>English:</strong> ${word.English}</p>
       <p><strong>Vietnamese:</strong> ${word.Vietnamese}</p>
-      <audio controls src="${word.Audio}"></audio>
+      <audio controls src="${sanitizeURL(word.Audio)}"></audio>
     `;
   }
 
@@ -122,8 +137,8 @@
   }
 
   loadData();
-console.log(data);
 </script>
+
 
 </body>
 </html>
